@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getCustomers, getOrders } from '@/services/api';
+import { formatCurrency } from '@/utils/helpers';
 
 export default function AdminCustomersPage() {
     const [customers, setCustomers] = useState([]);
@@ -51,7 +52,7 @@ export default function AdminCustomersPage() {
                                         <td className="px-6 py-4 text-slate-800 dark:text-slate-100">{customer.name}</td>
                                         <td className="px-6 py-4 text-slate-600 dark:text-slate-300">{customer.email}</td>
                                         <td className="px-6 py-4 text-slate-800 dark:text-slate-100">{customer.orders}</td>
-                                        <td className="px-6 py-4 text-slate-800 dark:text-slate-100 font-semibold">₹{customer.totalSpent.toFixed(2)}</td>
+                                        <td className="px-6 py-4 text-slate-800 dark:text-slate-100 font-semibold">{formatCurrency(customer.totalSpent)}</td>
                                     </tr>
                                 ))}
                                 {customers.length === 0 && (

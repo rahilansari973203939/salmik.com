@@ -1,6 +1,11 @@
 // Utility function to format currency
 export function formatCurrency(amount) {
-    return `₹${amount.toLocaleString('en-IN')}`;
+    return new Intl.NumberFormat('en-GB', {
+        style: 'currency',
+        currency: 'GBP',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(Number(amount || 0));
 }
 
 // Utility function to format date

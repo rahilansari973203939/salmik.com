@@ -8,11 +8,11 @@ export default function Footer() {
                     <div>
                         {/* Logo - matching navbar size */}
                         <Link href="/" className="inline-block mb-3">
-                            <span className="h-12 w-40 sm:h-14 sm:w-44 md:h-16 md:w-48 rounded-xl bg-white flex items-center justify-center overflow-hidden">
+                            <span className="h-16 w-52 sm:h-18 sm:w-56 md:h-20 md:w-64 rounded-xl flex items-center justify-center overflow-hidden">
                                 <img
                                     src="/images/salmik.png"
                                     alt="BrushRiceMart"
-                                    className="h-10 sm:h-12 md:h-14 w-auto"
+                                    className="h-24 sm:h-32 md:h-40 w-auto"
                                 />
                             </span>
                         </Link>

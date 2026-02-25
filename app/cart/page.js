@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
+import { formatCurrency } from '@/utils/helpers';
 
 const coupons = {
     BRUSH10: 0.1,
@@ -12,6 +13,7 @@ const coupons = {
 };
 
 const formatCategory = (value) => value?.split('-').map(word => word[0]?.toUpperCase() + word.slice(1)).join(' ');
+const isRiceItem = (category) => category?.includes('rice');
 
 export default function CartPage() {
     const { items, removeFromCart, updateQuantity, total } = useCart();
@@ -69,7 +71,9 @@ export default function CartPage() {
                                         <div className="flex-1">
                                             <h3 className="font-semibold text-slate-900 dark:text-white">{item.name}</h3>
                                             <p className="text-slate-500 text-sm">{formatCategory(item.category)}</p>
-                                            <p className="text-lg font-bold text-brand mt-2">₹{item.price}</p>
+                                            <p className="text-lg font-bold text-brand mt-2">
+                                                {isRiceItem(item.category) ? 'Coming Soon' : formatCurrency(item.price)}
+                                            </p>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="h-8 w-8 border border-slate-200 dark:border-slate-700 rounded hover:bg-brand/10">-</button>
@@ -86,7 +90,7 @@ export default function CartPage() {
                             <div className="space-y-4 border-b border-slate-200 dark:border-slate-800 pb-4 mb-4">
                                 <div className="flex justify-between text-slate-600 dark:text-slate-300">
                                     <span>Subtotal</span>
-                                    <span>₹{total?.toFixed(2) || '0.00'}</span>
+                                    <span>{formatCurrency(total)}</span>
                                 </div>
                                 <div className="flex justify-between text-slate-600 dark:text-slate-300">
                                     <span>Shipping</span>
@@ -95,13 +99,13 @@ export default function CartPage() {
                                 {appliedCoupon && (
                                     <div className="flex justify-between text-emerald-600 font-semibold">
                                         <span>Coupon ({appliedCoupon})</span>
-                                        <span>-₹{discountAmount.toFixed(2)}</span>
+                                        <span>-{formatCurrency(discountAmount)}</span>
                                     </div>
                                 )}
                             </div>
                             <div className="flex justify-between text-xl font-bold text-slate-900 dark:text-white mb-6">
                                 <span>Total</span>
-                                <span>₹{grandTotal.toFixed(2)}</span>
+                                <span>{formatCurrency(grandTotal)}</span>
                             </div>
 
                             <div className="mb-4">

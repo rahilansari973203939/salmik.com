@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useProducts } from '@/context/ProductContext';
+import { formatCurrency } from '@/utils/helpers';
 
 export default function RiceAndCombsSection() {
     const { products } = useProducts();
@@ -15,7 +16,8 @@ export default function RiceAndCombsSection() {
     const brushCategories = ['paddle-brush', 'round-brush', 'detangling-brush', 'comb'];
     const riceTypes = ['basmati-rice', 'brown-rice', 'jasmine-rice'];
 
-    const riceDisplayImages = ['/images/rice-images/images-1.jpeg', '/images/rice-images/images-2.jpeg'];
+    // Rice images from /images/rice/ folder as per requirements
+    const riceDisplayImages = ['/images/rice/images-1.jpeg', '/images/rice/images-2.jpeg'];
 
     const riceTypeLabels = {
         'basmati-rice': 'Basmati Rice',
@@ -87,7 +89,7 @@ export default function RiceAndCombsSection() {
                                             {product.name}
                                         </h3>
                                         <div className="flex items-center justify-between mt-1">
-                                            <p className="text-brand font-bold">£{product.price}</p>
+                                            <p className="text-brand font-bold">{formatCurrency(product.price)}</p>
                                             <span className="text-xs text-slate-500 capitalize">{product.color}</span>
                                         </div>
                                     </div>
@@ -123,41 +125,41 @@ export default function RiceAndCombsSection() {
                         ))}
                     </div>
 
-                    {/* Rice Products Grid */}
+                    {/* Rice Products Grid - Coming Soon with 5kg */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {riceProducts
                             .filter(p => p.category === activeRiceType)
                             .slice(0, 4)
                             .map((product, index) => (
-                                <Link
+                                <div
                                     key={product.id}
-                                    href={`/product/${product.id}`}
-                                    className="group relative block bg-slate-50 dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-soft transition"
+                                    className="group block bg-slate-50 dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-soft transition relative"
                                 >
-                                    {/* Coming Soon Overlay */}
-                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
-                                        <span className="text-white font-semibold text-lg px-4 py-2 bg-brand rounded-full">
-                                            Coming Soon
-                                        </span>
-                                    </div>
-
-                                    {/* Product Image */}
-                                    <div className="aspect-square p-4">
+                                    {/* Product Image with Coming Soon overlay */}
+                                    <div className="aspect-square p-4 relative">
                                         <img
                                             src={riceDisplayImages[index % riceDisplayImages.length] || product.image}
                                             alt={product.name}
                                             className="w-full h-full object-contain"
                                         />
+                                        {/* Coming Soon overlay */}
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                            <span className="bg-white/90 text-brand font-bold px-4 py-2 rounded-full text-sm">
+                                                Coming Soon
+                                            </span>
+                                        </div>
                                     </div>
 
-                                    {/* Product Info */}
+                                    {/* Product Info - Shows 5kg instead of price */}
                                     <div className="p-3 border-t border-slate-200 dark:border-slate-800">
                                         <h3 className="font-semibold text-slate-800 dark:text-white text-sm truncate">
                                             {product.name}
                                         </h3>
-                                        <p className="text-brand font-bold">£{product.price}</p>
+                                        <div className="flex items-center justify-between mt-1">
+                                            <span className="text-xs text-slate-500">5kg</span>
+                                        </div>
                                     </div>
-                                </Link>
+                                </div>
                             ))}
                     </div>
                 </div>

@@ -8,6 +8,9 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createOrder } from '@/services/api';
+import { formatCurrency } from '@/utils/helpers';
+
+const isRiceItem = (category) => category?.includes('rice');
 
 export default function CheckoutPage() {
     const { items, total, clearCart } = useCart();
@@ -109,14 +112,16 @@ export default function CheckoutPage() {
                                 {items?.map(item => (
                                     <div key={item.id} className="flex justify-between text-slate-600 dark:text-slate-300">
                                         <span>{item.name} × {item.quantity}</span>
-                                        <span className="font-semibold">£{(item.price * item.quantity).toFixed(2)}</span>
+                                        <span className="font-semibold">
+                                            {isRiceItem(item.category) ? 'Coming Soon' : formatCurrency(item.price * item.quantity)}
+                                        </span>
                                     </div>
                                 ))}
                             </div>
                             <div className="space-y-2">
                                 <div className="flex justify-between text-slate-600 dark:text-slate-300">
                                     <span>Subtotal</span>
-                                    <span>£{total?.toFixed(2) || '0.00'}</span>
+                                    <span>{formatCurrency(total)}</span>
                                 </div>
                                 <div className="flex justify-between text-slate-600 dark:text-slate-300">
                                     <span>Shipping</span>
@@ -124,7 +129,7 @@ export default function CheckoutPage() {
                                 </div>
                                 <div className="flex justify-between text-xl font-bold text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-slate-800">
                                     <span>Total</span>
-                                    <span>£{total?.toFixed(2) || '0.00'}</span>
+                                    <span>{formatCurrency(total)}</span>
                                 </div>
                             </div>
                         </div>

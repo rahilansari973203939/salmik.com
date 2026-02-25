@@ -30,17 +30,36 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     <Link href="/" className="flex items-center">
-                        <span className="h-12 w-40 sm:h-14 sm:w-44 md:h-16 md:w-48 rounded-xl bg-white flex items-center justify-center overflow-hidden">
+                        <span className="h-16 w-52 sm:h-18 sm:w-56 md:h-20 md:w-64 rounded-xl flex items-center justify-center overflow-hidden">
                             <img
                                 src="/images/salmik.png"
                                 alt="Salmik logo"
-                                className="h-10 sm:h-12 md:h-60 w-auto object-contain"
+                                className="h-24 sm:h-32 md:h-40 w-auto object-contain"
                             />
                         </span>
                     </Link>
 
-                    <div className="hidden lg:flex flex-1 mx-10">
-                        <form onSubmit={handleSearch} className="w-full">
+                    <div className="hidden lg:flex items-center gap-8 mx-10">
+
+
+                        {/* Navigation Menu Items */}
+                        <div className="flex items-center gap-6">
+                            <Link href="/" className="text-sm font-medium text-slate-600 hover:text-brand dark:text-slate-300">
+                                Home
+                            </Link>
+                            <Link href="/about" className="text-sm font-medium text-slate-600 hover:text-brand dark:text-slate-300">
+                                About
+                            </Link>
+                            <Link href="/products" className="text-sm font-medium text-slate-600 hover:text-brand dark:text-slate-300">
+                                Products
+                            </Link>
+
+                            <Link href="/contact" className="text-sm font-medium text-slate-600 hover:text-brand dark:text-slate-300">
+                                Contact
+                            </Link>
+                        </div>
+
+                        <form onSubmit={handleSearch} className="flex-1">
                             <div className="relative">
                                 <input
                                     type="text"
@@ -132,7 +151,8 @@ export default function Navbar() {
                 {isMobileMenuOpen && (
                     <div className="md:hidden pb-4 border-t border-slate-200/70 dark:border-slate-800">
                         <div className="flex flex-col gap-2 py-3 text-sm text-slate-600 dark:text-slate-300">
-                            <Link href="/products" className="hover:text-brand">Shop</Link>
+                            <Link href="/" className="hover:text-brand">Home</Link>
+                            <Link href="/products" className="hover:text-brand">Products</Link>
                             <Link href="/about" className="hover:text-brand">About</Link>
                             <Link href="/contact" className="hover:text-brand">Contact</Link>
                         </div>

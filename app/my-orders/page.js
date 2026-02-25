@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getOrders } from '@/services/api';
+import { formatCurrency } from '@/utils/helpers';
 
 const statusStyles = {
     pending: 'bg-yellow-100 text-yellow-800',
@@ -75,7 +76,7 @@ export default function MyOrdersPage() {
                                         </div>
                                         <div>
                                             <p className="text-slate-500 text-sm mb-1">Total</p>
-                                            <p className="font-bold text-brand">₹{order.total}</p>
+                                            <p className="font-bold text-brand">{formatCurrency(order.total)}</p>
                                         </div>
                                         <div>
                                             <p className="text-slate-500 text-sm mb-1">Status</p>

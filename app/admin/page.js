@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getDashboardStats } from '@/services/api';
+import { formatCurrency } from '@/utils/helpers';
 
 const salesSeries = [12, 18, 9, 22, 16, 28, 20];
 
@@ -35,7 +36,7 @@ export default function AdminDashboard() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-soft p-6 border border-slate-100 dark:border-slate-800">
                             <h3 className="text-slate-500 text-sm font-semibold mb-2">Total Sales</h3>
-                            <p className="text-3xl font-bold text-brand">₹{stats.totalSales.toLocaleString()}</p>
+                            <p className="text-3xl font-bold text-brand">{formatCurrency(stats.totalSales)}</p>
                         </div>
                         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-soft p-6 border border-slate-100 dark:border-slate-800">
                             <h3 className="text-slate-500 text-sm font-semibold mb-2">Today&apos;s Orders</h3>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createProduct, deleteProduct, getProducts, updateProduct } from '@/services/api';
+import { formatCurrency } from '@/utils/helpers';
 
 const categoryOptions = [
     { label: 'Paddle Brush', value: 'paddle-brush' },
@@ -202,7 +203,9 @@ export default function AdminProductsPage() {
                                     <tr key={product.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
                                         <td className="px-6 py-4 text-slate-800 dark:text-slate-100 font-semibold">{product.name}</td>
                                         <td className="px-6 py-4 text-slate-600 dark:text-slate-300">{product.category}</td>
-                                        <td className="px-6 py-4 text-slate-800 dark:text-slate-100">₹{product.price}</td>
+                                        <td className="px-6 py-4 text-slate-800 dark:text-slate-100">
+                                            {product.category?.includes('rice') ? 'Coming Soon' : formatCurrency(product.price)}
+                                        </td>
                                         <td className="px-6 py-4 text-slate-800 dark:text-slate-100">{product.stock}</td>
                                         <td className="px-6 py-4">
                                             <button className="text-brand hover:text-brand-dark font-semibold mr-4" onClick={() => handleEdit(product)}>Edit</button>

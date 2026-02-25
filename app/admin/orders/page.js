@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getOrders, updateOrderStatus } from '@/services/api';
+import { formatCurrency } from '@/utils/helpers';
 
 export default function AdminOrdersPage() {
     const [orders, setOrders] = useState([]);
@@ -23,6 +24,7 @@ export default function AdminOrdersPage() {
     };
 
     const handleInvoice = (order) => {
+        const hasRiceItems = (order.items || []).some((item) => item.category?.includes('rice'));
         const invoiceWindow = window.open('', '_blank');
         if (!invoiceWindow) return;
         invoiceWindow.document.write(`
@@ -55,12 +57,12 @@ export default function AdminOrdersPage() {
                                 <tr>
                                     <td>${item.name}</td>
                                     <td>${item.quantity}</td>
-                                    <td>₹${(item.price * item.quantity).toFixed(2)}</td>
+                                    <td>${item.category?.includes('rice') ? 'Coming Soon' : formatCurrency(item.price * item.quantity)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
-                    <h3>Total: ₹${(order.total || 0).toFixed(2)}</h3>
+                    <h3>Total: ${hasRiceItems ? 'Coming Soon' : formatCurrency(order.total || 0)}</h3>
                 </body>
             </html>
         `);
@@ -88,30 +90,33 @@ export default function AdminOrdersPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {orders.map(order => (
-                                    <tr key={order.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
-                                        <td className="px-6 py-4 text-slate-800 dark:text-slate-100 font-semibold">{order.orderNumber || order.id}</td>
-                                        <td className="px-6 py-4 text-slate-800 dark:text-slate-100">{order.shipping?.fullName || 'Guest'}</td>
-                                        <td className="px-6 py-4 text-slate-800 dark:text-slate-100 font-semibold">₹{order.total?.toFixed(2)}</td>
-                                        <td className="px-6 py-4">
-                                            <select
-                                                value={order.status}
-                                                onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                                                className="px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                                            >
-                                                <option value="pending">Pending</option>
-                                                <option value="shipped">Shipped</option>
-                                                <option value="delivered">Delivered</option>
-                                            </select>
-                                        </td>
-                                        <td className="px-6 py-4 text-slate-600 dark:text-slate-300">{new Date(order.createdAt).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4">
-                                            <button className="text-brand hover:text-brand-dark font-semibold" onClick={() => handleInvoice(order)}>
-                                                Invoice
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {orders.map(order => {
+                                    const hasRiceItems = (order.items || []).some((item) => item.category?.includes('rice'));
+                                    return (
+                                        <tr key={order.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
+                                            <td className="px-6 py-4 text-slate-800 dark:text-slate-100 font-semibold">{order.orderNumber || order.id}</td>
+                                            <td className="px-6 py-4 text-slate-800 dark:text-slate-100">{order.shipping?.fullName || 'Guest'}</td>
+                                            <td className="px-6 py-4 text-slate-800 dark:text-slate-100 font-semibold">{hasRiceItems ? 'Coming Soon' : formatCurrency(order.total)}</td>
+                                            <td className="px-6 py-4">
+                                                <select
+                                                    value={order.status}
+                                                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                                                    className="px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                                                >
+                                                    <option value="pending">Pending</option>
+                                                    <option value="shipped">Shipped</option>
+                                                    <option value="delivered">Delivered</option>
+                                                </select>
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-600 dark:text-slate-300">{new Date(order.createdAt).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4">
+                                                <button className="text-brand hover:text-brand-dark font-semibold" onClick={() => handleInvoice(order)}>
+                                                    Invoice
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                                 {orders.length === 0 && (
                                     <tr>
                                         <td colSpan="6" className="px-6 py-8 text-center text-slate-500">

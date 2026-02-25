@@ -9,6 +9,7 @@ import { useProducts } from '@/context/ProductContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
+import { formatCurrency } from '@/utils/helpers';
 
 const reviewsData = [
     { name: 'Ananya', rating: 5, comment: 'Fantastic quality and very gentle on my hair.', date: 'Jan 18, 2026' },
@@ -39,6 +40,7 @@ export default function ProductDetailPage() {
     const [selectedSize, setSelectedSize] = useState('');
     const [selectedColor, setSelectedColor] = useState('');
     const isBrushCategory = !!product?.category && product.category.includes('brush');
+    const isRiceCategory = !!product?.category && product.category.includes('rice');
 
     const relatedProducts = useMemo(() => {
         if (!product) return [];
@@ -125,11 +127,11 @@ export default function ProductDetailPage() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white dark:bg-slate-900 rounded-3xl shadow-soft p-8 border border-slate-100 dark:border-slate-800">
                         <div>
-                            <div className="h-96 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center overflow-hidden">
+                            <div className={`bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center overflow-hidden ${product.category?.includes('rice') ? 'h-[500px]' : 'h-96'}`}>
                                 <img
                                     src={activeImage || product.image}
                                     alt={product.name}
-                                    className="h-full w-full object-contain"
+                                    className={`h-full w-full ${product.category?.includes('rice') ? 'object-contain' : 'object-contain'}`}
                                 />
                             </div>
                             <div className="mt-4 flex gap-3">
@@ -159,17 +161,23 @@ export default function ProductDetailPage() {
                                 </div>
                                 <p className="text-slate-600 dark:text-slate-300 text-lg mb-4">{product.description}</p>
 
-                                <div className="flex items-baseline gap-3 mb-6">
-                                    <span className="text-3xl font-bold text-brand">£{product.price}</span>
-                                    {product.mrp && (
-                                        <span className="text-lg text-slate-400 line-through">£{product.mrp}</span>
-                                    )}
-                                    {product.mrp && (
-                                        <span className="text-sm font-semibold text-emerald-600">
-                                            Save £{(product.mrp - product.price).toFixed(2)}
-                                        </span>
-                                    )}
-                                </div>
+                                {!isRiceCategory ? (
+                                    <div className="flex items-baseline gap-3 mb-6">
+                                        <span className="text-3xl font-bold text-brand">{formatCurrency(product.price)}</span>
+                                        {product.mrp && (
+                                            <span className="text-lg text-slate-400 line-through">{formatCurrency(product.mrp)}</span>
+                                        )}
+                                        {product.mrp && (
+                                            <span className="text-sm font-semibold text-emerald-600">
+                                                Save {formatCurrency(product.mrp - product.price)}
+                                            </span>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="flex items-baseline gap-3 mb-6">
+                                        <span className="text-2xl font-bold text-brand">Coming Soon</span>
+                                    </div>
+                                )}
 
                                 {(product.color || availableColors.length > 0) && (
                                     <div className="mb-6">
@@ -221,22 +229,33 @@ export default function ProductDetailPage() {
                             </div>
 
                             <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                                <button
-                                    onClick={() => addToCart(product)}
-                                    className="w-full px-6 py-3 bg-gradient-to-r from-brand to-brand-dark text-white rounded-xl font-semibold hover:shadow-soft transition"
-                                >
-                                    Add to Cart
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        addToCart(product);
-                                        router.push('/checkout');
-                                    }}
-                                    className="w-full px-6 py-3 border border-brand text-brand rounded-xl font-semibold hover:bg-brand/10 transition text-center"
-                                >
-                                    Buy Now
-                                </button>
+                                {isRiceCategory ? (
+                                    <button
+                                        disabled
+                                        className="w-full px-6 py-3 bg-slate-300 text-slate-500 rounded-xl font-semibold cursor-not-allowed"
+                                    >
+                                        Coming Soon
+                                    </button>
+                                ) : (
+                                    <>
+                                        <button
+                                            onClick={() => addToCart(product)}
+                                            className="w-full px-6 py-3 bg-gradient-to-r from-brand to-brand-dark text-white rounded-xl font-semibold hover:shadow-soft transition"
+                                        >
+                                            Add to Cart
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                addToCart(product);
+                                                router.push('/checkout');
+                                            }}
+                                            className="w-full px-6 py-3 border border-brand text-brand rounded-xl font-semibold hover:bg-brand/10 transition text-center"
+                                        >
+                                            Buy Now
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

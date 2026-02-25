@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { formatCurrency } from '@/utils/helpers';
 
 const formatCategory = (value) => value.split('-').map(word => word[0]?.toUpperCase() + word.slice(1)).join(' ');
 
@@ -18,6 +19,9 @@ export default function ProductCard({ product, onAddToCart }) {
         ? Math.round(((product.mrp - product.price) / product.mrp) * 100)
         : 0;
 
+    // Check if product is rice
+    const isRice = product.category?.includes('rice');
+
     return (
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-soft hover:shadow-glow transition-shadow duration-300 overflow-hidden group border border-slate-100 dark:border-slate-800">
             <Link href={`/product/${product.id}`} aria-label={`View ${product.name}`} className="block">
@@ -27,7 +31,7 @@ export default function ProductCard({ product, onAddToCart }) {
                         alt={product.name}
                         className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                     />
-                    {discountPercent > 0 && (
+                    {discountPercent > 0 && !isRice && (
                         <div className="absolute top-2 right-2 bg-accent text-white px-2 py-1 rounded-md text-xs font-semibold">
                             -{discountPercent}%
                         </div>
@@ -53,19 +57,26 @@ export default function ProductCard({ product, onAddToCart }) {
                     </span>
                 </div>
 
-                <div className="flex items-baseline gap-2 mb-4">
-                    <span className="text-lg sm:text-xl font-bold text-brand">£{product.price}</span>
-                    {product.mrp && (
-                        <span className="text-sm text-slate-400 line-through">£{product.mrp}</span>
-                    )}
-                </div>
+                {/* Only show price for non-rice products */}
+                {!isRice ? (
+                    <div className="flex items-baseline gap-2 mb-4">
+                        <span className="text-lg sm:text-xl font-bold text-brand">{formatCurrency(product.price)}</span>
+                        {product.mrp && (
+                            <span className="text-sm text-slate-400 line-through">{formatCurrency(product.mrp)}</span>
+                        )}
+                    </div>
+                ) : (
+                    <div className="flex items-baseline gap-2 mb-4">
+                        <span className="text-sm font-bold text-brand">Coming Soon</span>
+                    </div>
+                )}
 
                 <button
                     onClick={handleAddToCart}
-                    disabled={isAdding || product.stock === 0}
+                    disabled={isAdding || product.stock === 0 || isRice}
                     className="w-full bg-gradient-to-r from-brand to-brand-dark text-white py-2 rounded-lg font-semibold hover:shadow-soft transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
-                    {isAdding ? '✓ Added' : product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                    {isRice ? 'Coming Soon' : isAdding ? '✓ Added' : product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
                 </button>
             </div>
         </div>

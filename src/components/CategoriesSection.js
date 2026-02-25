@@ -3,6 +3,7 @@
 import { useProducts } from '@/context/ProductContext';
 import Link from 'next/link';
 
+// Brush categories FIRST, then Rice categories
 const categoryCards = [
     { name: 'Paddle Brushes', value: 'paddle-brush', icon: '🪮', tone: 'from-emerald-100 to-emerald-50' },
     { name: 'Round Brushes', value: 'round-brush', icon: '🌀', tone: 'from-amber-100 to-orange-50' },

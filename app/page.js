@@ -25,8 +25,6 @@ export default function HomePage() {
 
         <FeaturedSection />
 
-        <RiceAndCombsSection />
-
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-display font-semibold text-slate-900 dark:text-white">
@@ -46,6 +44,8 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+
+        <RiceAndCombsSection />
 
         <CategoriesSection />
         <NewsletterSection />
