@@ -3,13 +3,28 @@
 import { formatCurrency } from '@/utils/helpers';
 
 const categoryOptions = [
-    { label: 'Paddle Brushes', value: 'paddle-brush', parent: 'brushes' },
-    { label: 'Round Brushes', value: 'round-brush', parent: 'brushes' },
-    { label: 'Detangling Brushes', value: 'detangling-brush', parent: 'brushes' },
-    { label: 'Combs', value: 'comb', parent: 'brushes' },
-    { label: 'Basmati Rice', value: 'basmati-rice', parent: 'rice' },
-    { label: 'Brown Rice', value: 'brown-rice', parent: 'rice' },
-    { label: 'Jasmine Rice', value: 'jasmine-rice', parent: 'rice' },
+    { label: 'Paddle Brushes', value: 'paddle-brush', parent: 'brushes', image: '/images/makaron/makaron.jpeg' },
+    { label: 'Round Brushes', value: 'round-brush', parent: 'brushes', image: '/images/curly/curly.jpeg' },
+    { label: 'Curly Brushes', value: 'curly', parent: 'brushes', image: '/images/curly/curlyy.jpeg' },
+    { label: 'Detanglers', value: 'detangling-brush', parent: 'brushes', image: '/images/jelly/jellyyyy.jpeg' },
+    { label: 'Easy Clean', value: 'easy-clean', parent: 'brushes', image: '/images/easy clean/easy clean.jpeg' },
+    { label: 'Jelly Brushes', value: 'jelly', parent: 'brushes', image: '/images/jelly/jelly.jpeg' },
+    { label: 'Kitty Puf', value: 'kitty-puf', parent: 'brushes', image: '/images/kitty puf/WhatsApp Image 2025-12-26 at 15.30.28.jpeg' },
+    { label: 'Love Collection', value: 'love', parent: 'brushes', image: '/images/love/WhatsApp Image 2025-12-26 at 15.30.27.jpeg' },
+    { label: 'Makaron', value: 'makaron', parent: 'brushes', image: '/images/makaron/makaron.jpeg' },
+    { label: 'Miracle', value: 'miracle', parent: 'brushes', image: '/images/miracle/Miracle.jpeg' },
+    { label: 'Mirror Shine', value: 'mirror', parent: 'brushes', image: '/images/mirror/Mirror.jpeg' },
+    { label: 'Multy Color', value: 'multy', parent: 'brushes', image: '/images/multy/multy.jpeg' },
+    { label: 'Pro Puf', value: 'pro-puf', parent: 'brushes', image: '/images/pro puf/pro puf.jpeg' },
+    { label: 'Self Cleaning', value: 'self-cleaning', parent: 'brushes', image: '/images/self cleaning/self cleaning.jpeg' },
+    { label: 'Shiny', value: 'shiny', parent: 'brushes', image: '/images/shiny/shinyy.jpeg' },
+    { label: 'Smiley', value: 'smiley', parent: 'brushes', image: '/images/smiley/smiley.jpeg' },
+    { label: 'Twist', value: 'twist', parent: 'brushes', image: '/images/twist/twist.jpeg' },
+    { label: 'Detangler', value: 'detangler', parent: 'brushes', image: '/images/jelly/jelly.jpeg' },
+    { label: 'Combs', value: 'comb', parent: 'brushes', image: '/images/twist/twist.jpeg' },
+    { label: 'Basmati Rice', value: 'basmati-rice', parent: 'rice', image: '/images/rice/images-1.jpeg' },
+    { label: 'Brown Rice', value: 'brown-rice', parent: 'rice', image: '/images/rice/images-2.jpeg' },
+    { label: 'Jasmine Rice', value: 'jasmine-rice', parent: 'rice', image: '/images/rice/images-1.jpeg' },
 ];
 
 const mainCategories = [
@@ -24,7 +39,6 @@ export default function FilterSidebar({
     priceRange,
     onPriceRangeChange,
 }) {
-    // Handle main category selection (Brushes or Rice)
     const handleMainCategoryChange = (value) => {
         if (value === '') {
             onCategoryChange(null);
@@ -37,10 +51,10 @@ export default function FilterSidebar({
         }
     };
 
-    // Determine which main category is currently selected
     const getSelectedMainCategory = () => {
         if (!selectedCategory) return '';
-        if (['paddle-brush', 'round-brush', 'detangling-brush', 'comb'].includes(selectedCategory)) {
+        const brushCategories = ['paddle-brush', 'round-brush', 'curly', 'detangling-brush', 'easy-clean', 'jelly', 'kitty-puf', 'love', 'makaron', 'miracle', 'mirror', 'multy', 'pro-puf', 'self-cleaning', 'shiny', 'smiley', 'twist', 'detangler', 'comb'];
+        if (brushCategories.includes(selectedCategory)) {
             return 'brushes';
         }
         if (selectedCategory.includes('rice')) {
@@ -51,7 +65,6 @@ export default function FilterSidebar({
 
     const selectedMainCategory = getSelectedMainCategory();
 
-    // Filter sub-categories based on main category
     const getSubCategories = () => {
         if (!selectedMainCategory) return categoryOptions;
         return categoryOptions.filter(c => c.parent === selectedMainCategory);
@@ -96,7 +109,6 @@ export default function FilterSidebar({
                 </div>
             </div>
 
-            {/* Sub-categories based on main selection */}
             {selectedMainCategory && (
                 <div className="mb-6">
                     <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">

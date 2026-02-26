@@ -10,10 +10,12 @@ export default function RiceAndCombsSection() {
     const [activeRiceType, setActiveRiceType] = useState('basmati-rice');
     const [activeBrushCategory, setActiveBrushCategory] = useState('paddle-brush');
 
-    const brushProducts = products?.filter(p => ['paddle-brush', 'round-brush', 'detangling-brush', 'comb'].includes(p.category)) || [];
+    const brushProducts = products?.filter(p =>
+        ['paddle-brush', 'round-brush', 'detangling-brush', 'comb', 'curly', 'easy-clean', 'jelly', 'kitty-puf', 'love', 'makaron', 'miracle', 'mirror', 'multy', 'pro-puf', 'self-cleaning', 'shiny', 'smiley', 'twist', 'detangler'].includes(p.category)
+    ) || [];
     const riceProducts = products?.filter(p => ['basmati-rice', 'brown-rice', 'jasmine-rice'].includes(p.category)) || [];
 
-    const brushCategories = ['paddle-brush', 'round-brush', 'detangling-brush', 'comb'];
+    const brushCategories = ['paddle-brush', 'round-brush', 'curly', 'detangling-brush', 'easy-clean', 'jelly', 'kitty-puf', 'love', 'makaron', 'miracle', 'mirror', 'multy', 'pro-puf', 'self-cleaning', 'shiny', 'smiley', 'twist', 'detangler', 'comb'];
     const riceTypes = ['basmati-rice', 'brown-rice', 'jasmine-rice'];
 
     // Rice images from /images/rice/ folder as per requirements
@@ -28,7 +30,22 @@ export default function RiceAndCombsSection() {
     const brushCategoryLabels = {
         'paddle-brush': 'Paddle Brushes',
         'round-brush': 'Round Brushes',
-        'detangling-brush': 'Detangling Brushes',
+        'curly': 'Curly Brushes',
+        'detangling-brush': 'Detanglers',
+        'easy-clean': 'Easy Clean',
+        'jelly': 'Jelly Brushes',
+        'kitty-puf': 'Kitty Puf',
+        'love': 'Love Collection',
+        'makaron': 'Makaron',
+        'miracle': 'Miracle',
+        'mirror': 'Mirror Shine',
+        'multy': 'Multy Color',
+        'pro-puf': 'Pro Puf',
+        'self-cleaning': 'Self Cleaning',
+        'shiny': 'Shiny',
+        'smiley': 'Smiley',
+        'twist': 'Twist',
+        'detangler': 'Detangler',
         'comb': 'Combs'
     };
 

@@ -30,22 +30,6 @@ export default function ContactPage() {
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
                     <h1 className="text-4xl font-display font-semibold text-slate-900 dark:text-white mb-8">Contact Us</h1>
 
-                    {/* Google Map */}
-                    <div className="mb-8">
-                        <div className="w-full h-80 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
-                            <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2157.482737839594!2d-2.1028!3d57.1497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTfCsDA4JzU0LjAiTiAywrAwNic1Mi4xJcKWMDDCsTA0JzAwLjAiVw!5e0!3m2!1sen!2suk!4v1234567890"
-                                width="100%"
-                                height="100%"
-                                style={{ border: 0 }}
-                                allowFullScreen=""
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                                title="Our Location"
-                            ></iframe>
-                        </div>
-                    </div>
-
                     {/* Search Option */}
                     <div className="mb-8">
                         <form onSubmit={handleSearch} className="flex gap-4">
@@ -97,6 +81,22 @@ export default function ContactPage() {
                                     <p>Saturday: 9am - 2pm PST</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Google Map - Now at the bottom */}
+                    <div className="mt-8">
+                        <div className="w-full h-80 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2157.482737839594!2d-2.1028!3d57.1497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTfCsDA4JzU0LjAiTiAywrAwNic1Mi4xJcKWMDDCsTA0JzAwLjAiVw!5e0!3m2!1sen!2suk!4v1234567890"
+                                width="100%"
+                                height="100%"
+                                style={{ border: 0 }}
+                                allowFullScreen=""
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                                title="Our Location"
+                            ></iframe>
                         </div>
                     </div>
                 </div>
