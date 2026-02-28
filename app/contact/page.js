@@ -31,7 +31,7 @@ export default function ContactPage() {
                     <h1 className="text-4xl font-display font-semibold text-slate-900 dark:text-white mb-8">Contact Us</h1>
 
                     {/* Search Option */}
-                    <div className="mb-8">
+                    {/* <div className="mb-8">
                         <form onSubmit={handleSearch} className="flex gap-4">
                             <input
                                 type="text"
@@ -47,7 +47,7 @@ export default function ContactPage() {
                                 Search
                             </button>
                         </form>
-                    </div>
+                    </div> */}
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-soft p-8 border border-slate-100 dark:border-slate-800">
@@ -88,13 +88,13 @@ export default function ContactPage() {
                     <div className="mt-8">
                         <div className="w-full h-80 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
                             <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2157.482737839594!2d-2.1028!3d57.1497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTfCsDA4JzU0LjAiTiAywrAwNic1Mi4xJcKWMDDCsTA0JzAwLjAiVw!5e0!3m2!1sen!2suk!4v1234567890"
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2164.130163694526!2d-2.1137194239172565!3d57.15193188336891!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48840e1f5cc5c3a5%3A0xb4e55f29426a9127!2sForbes%20St%2C%20Aberdeen%2C%20UK!5e0!3m2!1sen!2sin!4v1772198766733!5m2!1sen!2sin"
                                 width="100%"
                                 height="100%"
                                 style={{ border: 0 }}
-                                allowFullScreen=""
+                                allowfullscreen=""
                                 loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
+                                referrerpolicy="no-referrer-when-downgrade"
                                 title="Our Location"
                             ></iframe>
                         </div>

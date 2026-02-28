@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import AdminSidebar from '@/components/AdminSidebar';
 import { createProduct, deleteProduct, getProducts, updateProduct } from '@/services/api';
 import { formatCurrency } from '@/utils/helpers';
+import { useAuth } from '@/context/AuthContext';
 
 const categoryOptions = [
     { label: 'Paddle Brush', value: 'paddle-brush' },
@@ -30,6 +31,16 @@ export default function AdminProductsPage() {
     const [products, setProducts] = useState([]);
     const [formData, setFormData] = useState(emptyForm);
     const [editingId, setEditingId] = useState(null);
+    const [importStatus, setImportStatus] = useState('');
+    const fileInputRef = useRef(null);
+    const { user, isLoading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isLoading && (!user || user.role !== 'admin')) {
+            router.push('/login');
+        }
+    }, [user, isLoading, router]);
 
     useEffect(() => {
         const loadProducts = async () => {
@@ -44,6 +55,66 @@ export default function AdminProductsPage() {
         setProducts(loadedProducts);
         setEditingId(null);
         setFormData(emptyForm);
+    };
+
+    // Export products to JSON file
+    const handleExport = () => {
+        const dataStr = JSON.stringify(products, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `products-export-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    // Import products from JSON file
+    const handleImport = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            try {
+                const importedProducts = JSON.parse(event.target?.result);
+
+                if (!Array.isArray(importedProducts)) {
+                    setImportStatus('Error: Invalid file format. Expected an array of products.');
+                    return;
+                }
+
+                // Validate imported products
+                const validProducts = importedProducts.filter(p => p.name && p.category);
+
+                if (validProducts.length === 0) {
+                    setImportStatus('Error: No valid products found in the file.');
+                    return;
+                }
+
+                // Save to localStorage
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('products', JSON.stringify(validProducts));
+                    localStorage.setItem('productsVersion', '3');
+                }
+
+                setImportStatus(`Success! Imported ${validProducts.length} products.`);
+                refreshProducts();
+
+                // Clear status after 3 seconds
+                setTimeout(() => setImportStatus(''), 3000);
+            } catch (error) {
+                setImportStatus('Error: Failed to parse the file. Please check the JSON format.');
+            }
+        };
+        reader.readAsText(file);
+
+        // Reset file input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
     const handleFileChange = (e) => {
@@ -97,12 +168,65 @@ export default function AdminProductsPage() {
         refreshProducts();
     };
 
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand"></div>
+            </div>
+        );
+    }
+
+    if (!user || user.role !== 'admin') {
+        return null;
+    }
+
     return (
-        <>
-            <Navbar />
-            <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+            <AdminSidebar />
+            <main className="ml-64 min-h-screen">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <h1 className="text-4xl font-display font-semibold text-slate-900 dark:text-white mb-6">Product Management</h1>
+                    <div className="flex justify-between items-center mb-6">
+                        <h1 className="text-4xl font-display font-semibold text-slate-900 dark:text-white">Product Management</h1>
+
+                        {/* Export/Import Buttons */}
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleExport}
+                                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Export Products
+                            </button>
+                            <div className="relative">
+                                <input
+                                    type="file"
+                                    accept=".json"
+                                    onChange={handleImport}
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    id="import-products"
+                                />
+                                <label
+                                    htmlFor="import-products"
+                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                    Import Products
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Import Status Message */}
+                    {importStatus && (
+                        <div className={`mb-4 p-3 rounded-lg ${importStatus.startsWith('Success') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {importStatus}
+                        </div>
+                    )}
 
                     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-soft p-6 border border-slate-100 dark:border-slate-800 mb-8">
                         <h2 className="text-2xl font-display font-semibold text-slate-900 dark:text-white mb-4">
@@ -215,10 +339,14 @@ export default function AdminProductsPage() {
                                 ))}
                             </tbody>
                         </table>
+                        {products.length === 0 && (
+                            <div className="text-center py-8 text-slate-500">
+                                No products found. Add some products or import from a JSON file.
+                            </div>
+                        )}
                     </div>
                 </div>
             </main>
-            <Footer />
-        </>
+        </div>
     );
 }

@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import { useRouter } from 'next/navigation';
+import AdminSidebar from '@/components/AdminSidebar';
 import { getDashboardStats } from '@/services/api';
 import { formatCurrency } from '@/utils/helpers';
+import { useAuth } from '@/context/AuthContext';
 
 const salesSeries = [12, 18, 9, 22, 16, 28, 20];
 
@@ -15,6 +16,14 @@ export default function AdminDashboard() {
         totalOrders: 0,
         lowStockProducts: [],
     });
+    const { user, isLoading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isLoading && (!user || user.role !== 'admin')) {
+            router.push('/login');
+        }
+    }, [user, isLoading, router]);
 
     useEffect(() => {
         const loadStats = async () => {
@@ -26,10 +35,22 @@ export default function AdminDashboard() {
 
     const todayOrders = stats.todayOrders || 12;
 
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand"></div>
+            </div>
+        );
+    }
+
+    if (!user || user.role !== 'admin') {
+        return null;
+    }
+
     return (
-        <>
-            <Navbar />
-            <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+            <AdminSidebar />
+            <main className="ml-64 min-h-screen">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <h1 className="text-4xl font-display font-semibold text-slate-900 dark:text-white mb-8">Admin Dashboard</h1>
 
@@ -86,7 +107,6 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             </main>
-            <Footer />
-        </>
+        </div>
     );
 }

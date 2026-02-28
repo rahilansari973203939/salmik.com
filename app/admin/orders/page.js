@@ -1,13 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import { useRouter } from 'next/navigation';
+import AdminSidebar from '@/components/AdminSidebar';
 import { getOrders, updateOrderStatus } from '@/services/api';
 import { formatCurrency } from '@/utils/helpers';
+import { useAuth } from '@/context/AuthContext';
 
 export default function AdminOrdersPage() {
     const [orders, setOrders] = useState([]);
+    const { user, isLoading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isLoading && (!user || user.role !== 'admin')) {
+            router.push('/login');
+        }
+    }, [user, isLoading, router]);
 
     useEffect(() => {
         const loadOrders = async () => {
@@ -70,10 +79,22 @@ export default function AdminOrdersPage() {
         invoiceWindow.print();
     };
 
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand"></div>
+            </div>
+        );
+    }
+
+    if (!user || user.role !== 'admin') {
+        return null;
+    }
+
     return (
-        <>
-            <Navbar />
-            <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+            <AdminSidebar />
+            <main className="ml-64 min-h-screen">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <h1 className="text-4xl font-display font-semibold text-slate-900 dark:text-white mb-8">Order Management</h1>
 
@@ -119,7 +140,7 @@ export default function AdminOrdersPage() {
                                 })}
                                 {orders.length === 0 && (
                                     <tr>
-                                        <td colSpan="6" className="px-6 py-8 text-center text-slate-500">
+                                        <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
                                             No orders yet.
                                         </td>
                                     </tr>
@@ -129,7 +150,6 @@ export default function AdminOrdersPage() {
                     </div>
                 </div>
             </main>
-            <Footer />
-        </>
+        </div>
     );
 }

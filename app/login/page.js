@@ -16,16 +16,54 @@ export default function LoginPage() {
     const [generatedOtp, setGeneratedOtp] = useState('');
     const [otpValue, setOtpValue] = useState('');
     const [error, setError] = useState('');
+    const [sendingOtp, setSendingOtp] = useState(false);
 
-    const sendOtp = () => {
+    // Check if email is registered in the system
+    const checkEmailRegistered = (email) => {
+        if (!email) return false;
+        const users = JSON.parse(localStorage.getItem('allUsers') || '[]');
+        const exists = users.some((u) => u.email === email);
+
+        // Also check for admin email
+        if (email === 'admin@salmik.com') return true;
+
+        return exists;
+    };
+
+    const sendOtp = async () => {
+        setError('');
+
         if (!formData.email) {
-            setError('Enter your email to receive OTP.');
+            setError('Please enter your email address.');
             return;
         }
+
+        // Check for valid email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            setError('Please enter a valid email address.');
+            return;
+        }
+
+        // Check if email is registered before sending OTP
+        if (!checkEmailRegistered(formData.email)) {
+            setError('This email is not registered. Please sign up first.');
+            return;
+        }
+
+        setSendingOtp(true);
+
+        // Simulate sending OTP to email (in production, this would call an API)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         setGeneratedOtp(otp);
         setOtpSent(true);
+        setSendingOtp(false);
         setError('');
+
+        // In production, you would send this OTP via email service
+        console.log(`OTP sent to ${formData.email}: ${otp}`);
     };
 
     const handleSubmit = async (e) => {
@@ -34,25 +72,54 @@ export default function LoginPage() {
 
         if (useOtp) {
             if (!otpSent) {
-                setError('Please send OTP first.');
+                setError('Please send OTP first by clicking the button below.');
                 return;
             }
+
+            if (!otpValue) {
+                setError('Please enter the OTP sent to your email.');
+                return;
+            }
+
             if (otpValue !== generatedOtp) {
-                setError('Invalid OTP. Try again.');
+                setError('Invalid OTP. Please check and try again.');
                 return;
             }
+
+            // Verify email is registered before OTP login
+            if (!checkEmailRegistered(formData.email)) {
+                setError('This email is not registered. Please sign up first.');
+                return;
+            }
+
             const result = await loginWithOtp(formData.email);
             if (result.success) {
-                router.push('/');
+                // Check if user is admin and redirect accordingly
+                if (result.user?.role === 'admin') {
+                    router.push('/admin');
+                } else {
+                    router.push('/');
+                }
             } else {
                 setError(result.error || 'OTP login failed.');
             }
             return;
         }
 
+        // Check if email is registered before password login
+        if (!checkEmailRegistered(formData.email)) {
+            setError('This email is not registered. Please sign up first.');
+            return;
+        }
+
         const result = await login(formData.email, formData.password);
         if (result.success) {
-            router.push('/');
+            // Check if user is admin and redirect accordingly
+            if (result.user?.role === 'admin') {
+                router.push('/admin');
+            } else {
+                router.push('/');
+            }
         } else {
             setError(result.error || 'Login failed. Please try again.');
         }
@@ -77,7 +144,14 @@ export default function LoginPage() {
                             type="email"
                             placeholder="Email Address"
                             value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            onChange={(e) => {
+                                setFormData({ ...formData, email: e.target.value });
+                                // Reset OTP if email changes
+                                if (otpSent) {
+                                    setOtpSent(false);
+                                    setOtpValue('');
+                                }
+                            }}
                             className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                             required
                         />
@@ -98,15 +172,19 @@ export default function LoginPage() {
                                 <button
                                     type="button"
                                     onClick={sendOtp}
-                                    className="w-full px-4 py-2 bg-accent text-white rounded-lg font-semibold hover:bg-accent-dark transition"
+                                    disabled={sendingOtp || otpSent}
+                                    className="w-full px-4 py-2 bg-accent text-white rounded-lg font-semibold hover:bg-accent-dark transition disabled:opacity-50"
                                 >
-                                    {otpSent ? 'Resend OTP' : 'Send OTP'}
+                                    {sendingOtp ? 'Sending OTP...' : otpSent ? 'OTP Sent ✓' : 'Send OTP to Email'}
                                 </button>
                                 {otpSent && (
                                     <>
+                                        <p className="text-sm text-green-600 dark:text-green-400">
+                                            ✓ OTP has been sent to your email: {formData.email}
+                                        </p>
                                         <input
                                             type="text"
-                                            placeholder="Enter OTP"
+                                            placeholder="Enter OTP from your email"
                                             value={otpValue}
                                             onChange={(e) => setOtpValue(e.target.value)}
                                             className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
@@ -118,7 +196,7 @@ export default function LoginPage() {
                             </div>
                         )}
 
-                        <button type="submit" disabled={isLoading} className="w-full px-8 py-3 bg-gradient-to-r from-brand to-brand-dark text-white rounded-full font-semibold hover:shadow-glow transition disabled:opacity-50">
+                        <button type="submit" disabled={isLoading || (useOtp && !otpSent)} className="w-full px-8 py-3 bg-gradient-to-r from-brand to-brand-dark text-white rounded-full font-semibold hover:shadow-glow transition disabled:opacity-50">
                             {isLoading ? 'Logging in...' : 'Log In'}
                         </button>
                     </form>
@@ -139,6 +217,14 @@ export default function LoginPage() {
                         <Link href="/signup" className="text-slate-600 dark:text-slate-300 hover:text-brand">
                             Create account
                         </Link>
+                    </div>
+
+                    <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                        <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
+                            <span className="font-semibold">Admin Login:</span><br />
+                            Email: admin@salmik.com<br />
+                            Password: admin123
+                        </p>
                     </div>
                 </div>
             </main>

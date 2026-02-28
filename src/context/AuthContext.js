@@ -4,6 +4,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
+// Admin credentials
+const ADMIN_EMAIL = 'admin@salmik.com';
+const ADMIN_PASSWORD = 'admin123';
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -35,6 +39,7 @@ export const AuthProvider = ({ children }) => {
                 email,
                 name,
                 password, // In real app, password should be hashed
+                role: 'customer',
                 createdAt: new Date().toISOString(),
             };
 
@@ -50,7 +55,20 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            // Mock login
+            // Check for admin login first
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                const adminUser = {
+                    id: 'admin-001',
+                    email: ADMIN_EMAIL,
+                    name: 'Admin',
+                    role: 'admin',
+                };
+                localStorage.setItem('user', JSON.stringify(adminUser));
+                setUser(adminUser);
+                return { success: true, user: adminUser };
+            }
+
+            // Mock login for regular users
             const users = JSON.parse(localStorage.getItem('allUsers') || '[]');
             const existingUser = users.find((u) => u.email === email);
 
@@ -69,6 +87,19 @@ export const AuthProvider = ({ children }) => {
 
     const loginWithOtp = async (email) => {
         try {
+            // Check for admin email
+            if (email === ADMIN_EMAIL) {
+                const adminUser = {
+                    id: 'admin-001',
+                    email: ADMIN_EMAIL,
+                    name: 'Admin',
+                    role: 'admin',
+                };
+                localStorage.setItem('user', JSON.stringify(adminUser));
+                setUser(adminUser);
+                return { success: true, user: adminUser };
+            }
+
             const users = JSON.parse(localStorage.getItem('allUsers') || '[]');
             const existingUser = users.find((u) => u.email === email);
             if (!existingUser) {
@@ -88,8 +119,11 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    // Check if user is admin
+    const isAdmin = user && user.role === 'admin';
+
     return (
-        <AuthContext.Provider value={{ user, isLoading, register, login, loginWithOtp, logout }}>
+        <AuthContext.Provider value={{ user, isLoading, register, login, loginWithOtp, logout, isAdmin }}>
             {children}
         </AuthContext.Provider>
     );
