@@ -35,6 +35,17 @@ export const ProductProvider = ({ children }) => {
         loadProducts();
     }, []);
 
+    // Define brush categories (all brush types)
+    const brushCategories = [
+        'paddle-brush', 'round-brush', 'curly', 'detangling-brush',
+        'easy-clean', 'jelly', 'kitty-puf', 'love', 'makaron',
+        'miracle', 'mirror', 'multy', 'pro-puf', 'self-cleaning',
+        'shiny', 'smiley', 'twist', 'detangler', 'comb'
+    ];
+
+    // Define rice categories
+    const riceCategories = ['basmati-rice', 'brown-rice', 'jasmine-rice'];
+
     // Apply filters and sorting
     useEffect(() => {
         let filtered = [...products];
@@ -47,9 +58,28 @@ export const ProductProvider = ({ children }) => {
             );
         }
 
-        // Category filter
+        // Category filter with proper brush/rice separation
         if (filters.category) {
-            filtered = filtered.filter(product => product.category === filters.category);
+            // If selected category is a brush category
+            if (brushCategories.includes(filters.category)) {
+                filtered = filtered.filter(product => product.category === filters.category);
+            }
+            // If selected category is a rice category
+            else if (riceCategories.includes(filters.category)) {
+                filtered = filtered.filter(product => product.category === filters.category);
+            }
+            // Legacy support for 'rice' selection
+            else if (filters.category === 'rice') {
+                filtered = filtered.filter(product => riceCategories.includes(product.category));
+            }
+            // Legacy support for 'brushes' selection
+            else if (filters.category === 'brushes') {
+                filtered = filtered.filter(product => brushCategories.includes(product.category));
+            }
+            // For any other category
+            else {
+                filtered = filtered.filter(product => product.category === filters.category);
+            }
         }
 
         // Price filter
@@ -100,19 +130,38 @@ export const ProductProvider = ({ children }) => {
         setSortBy('newest');
     };
 
+    // Get product by ID - handles both string and number IDs
     const getProductById = (id) => {
-        return products.find(product => product.id === parseInt(id));
+        const idStr = String(id);
+        const idNum = parseInt(id);
+        return products.find(product =>
+            String(product.id) === idStr ||
+            product.id === idNum ||
+            product.id === id
+        );
     };
 
+    // Get related products - same category, excluding current product
     const getRelatedProducts = (productId, limit = 4) => {
         const product = getProductById(productId);
         if (!product) return [];
 
         return products
             .filter(
-                p => p.category === product.category && p.id !== productId
+                p => p.category === product.category && String(p.id) !== String(productId)
             )
             .slice(0, limit);
+    };
+
+    // Get products by category
+    const getProductsByCategory = (category) => {
+        return products.filter(p => p.category === category);
+    };
+
+    // Check if product is rice category
+    const isRiceProduct = (productId) => {
+        const product = getProductById(productId);
+        return product?.category?.includes('rice');
     };
 
     return (
@@ -128,6 +177,8 @@ export const ProductProvider = ({ children }) => {
                 setSortBy,
                 getProductById,
                 getRelatedProducts,
+                getProductsByCategory,
+                isRiceProduct,
             }}
         >
             {children}

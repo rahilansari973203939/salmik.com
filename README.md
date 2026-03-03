@@ -427,7 +427,6 @@ Components are ready for testing with:
 ## Future Enhancements
 
 - [ ] Real database integration
-- [ ] Real payment gateway (Razorpay)
 - [ ] Email notifications
 - [ ] SMS OTP verification
 - [ ] Advanced analytics

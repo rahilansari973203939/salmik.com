@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import HeroSlider from '@/components/HeroSlider';
@@ -8,12 +9,56 @@ import CategoriesSection from '@/components/CategoriesSection';
 import NewsletterSection from '@/components/NewsletterSection';
 import FeaturedSection from '@/components/FeaturedSection';
 import RiceAndCombsSection from '@/components/RiceAndCombsSection';
-import { useProducts } from '@/context/ProductContext';
 import { useCart } from '@/context/CartContext';
+import { supabase } from '@/lib/supabase';
 
 export default function HomePage() {
-  const { products } = useProducts();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setProducts(data);
+        setLoading(false);
+        return;
+      }
+
+      const productsData = await import('@/data/products.json');
+      setProducts(productsData.default || productsData);
+    } catch (error) {
+      console.log('Using local products data');
+      try {
+        const productsData = await import('@/data/products.json');
+        setProducts(productsData.default || productsData);
+      } catch (e) {
+        console.error('Error loading products:', e);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const brushProducts = products?.filter(p =>
+    p.category !== 'comb' &&
+    !p.category?.includes('rice') &&
+    p.category !== 'basmati-rice' &&
+    p.category !== 'brown-rice' &&
+    p.category !== 'jasmine-rice'
+  ) || [];
 
   return (
     <>
@@ -34,15 +79,25 @@ export default function HomePage() {
               Browse all →
             </a>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products?.filter(p => p.category !== 'comb' && !p.category.includes('rice')).slice(0, 8).map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onAddToCart={() => addToCart(product)}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-200 dark:bg-slate-800 rounded-2xl h-64"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {brushProducts.slice(0, 8).map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onAddToCart={() => addToCart(product)}
+                />
+              ))}
+            </div>
+          )}
         </section>
 
         <RiceAndCombsSection />

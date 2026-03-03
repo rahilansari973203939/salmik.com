@@ -47,12 +47,38 @@ function ProductsContent() {
         }
     };
 
+    // Define brush categories (all brush types)
+    const brushCategories = [
+        'paddle-brush', 'round-brush', 'curly', 'detangling-brush',
+        'easy-clean', 'jelly', 'kitty-puf', 'love', 'makaron',
+        'miracle', 'mirror', 'multy', 'pro-puf', 'self-cleaning',
+        'shiny', 'smiley', 'twist', 'detangler', 'comb'
+    ];
+
+    // Define rice categories
+    const riceCategories = ['basmati-rice', 'brown-rice', 'jasmine-rice'];
+
     // Filter products
     const filteredProducts = products.filter(product => {
         if (selectedCategory) {
-            if (selectedCategory === 'rice') {
-                if (!product.category?.includes('rice')) return false;
-            } else if (product.category !== selectedCategory) {
+            // If selected category is a brush category
+            if (brushCategories.includes(selectedCategory)) {
+                if (product.category !== selectedCategory) return false;
+            }
+            // If selected category is a rice category
+            else if (riceCategories.includes(selectedCategory)) {
+                if (product.category !== selectedCategory) return false;
+            }
+            // Legacy support for 'rice' selection
+            else if (selectedCategory === 'rice') {
+                if (!riceCategories.includes(product.category)) return false;
+            }
+            // Legacy support for 'brushes' selection
+            else if (selectedCategory === 'brushes') {
+                if (!brushCategories.includes(product.category)) return false;
+            }
+            // For any other category
+            else if (product.category !== selectedCategory) {
                 return false;
             }
         }
@@ -117,6 +143,7 @@ function ProductsContent() {
                 </h1>
 
                 <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Filter Sidebar */}
                     <FilterSidebar
                         categories={categories}
                         selectedCategory={selectedCategory}
@@ -126,6 +153,7 @@ function ProductsContent() {
                     />
 
                     <div className="flex-1">
+                        {/* Search and Sort */}
                         <div className="flex flex-col sm:flex-row gap-4 mb-6">
                             <input
                                 type="text"
@@ -146,6 +174,7 @@ function ProductsContent() {
                             </select>
                         </div>
 
+                        {/* Products Grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {sortedProducts.map(product => (
                                 <ProductCard key={product.id} product={product} />

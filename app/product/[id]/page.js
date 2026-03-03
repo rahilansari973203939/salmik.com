@@ -35,12 +35,39 @@ export default function ProductDetailPage() {
     const router = useRouter();
     const { getProductById, getRelatedProducts, isLoading, products: allProducts } = useProducts();
     const { addToCart } = useCart();
-    const product = getProductById?.(params.id);
+
+    // Get product using the improved getProductById function
+    const product = getProductById(params.id);
     const [activeImage, setActiveImage] = useState('');
     const [selectedSize, setSelectedSize] = useState('');
     const [selectedColor, setSelectedColor] = useState('');
-    const isBrushCategory = !!product?.category && product.category.includes('brush');
-    const isRiceCategory = !!product?.category && product.category.includes('rice');
+
+    // Check category type
+    const isBrushCategory = product?.category?.includes('brush') ||
+        product?.category === 'paddle-brush' ||
+        product?.category === 'round-brush' ||
+        product?.category === 'curly' ||
+        product?.category === 'detangling-brush' ||
+        product?.category === 'easy-clean' ||
+        product?.category === 'jelly' ||
+        product?.category === 'kitty-puf' ||
+        product?.category === 'love' ||
+        product?.category === 'makaron' ||
+        product?.category === 'miracle' ||
+        product?.category === 'mirror' ||
+        product?.category === 'multy' ||
+        product?.category === 'pro-puf' ||
+        product?.category === 'self-cleaning' ||
+        product?.category === 'shiny' ||
+        product?.category === 'smiley' ||
+        product?.category === 'twist' ||
+        product?.category === 'detangler' ||
+        product?.category === 'comb';
+
+    const isRiceCategory = product?.category?.includes('rice') ||
+        product?.category === 'basmati-rice' ||
+        product?.category === 'brown-rice' ||
+        product?.category === 'jasmine-rice';
 
     const relatedProducts = useMemo(() => {
         if (!product) return [];
@@ -49,10 +76,16 @@ export default function ProductDetailPage() {
 
     useEffect(() => {
         if (!product) return;
-        const defaultImage = isBrushCategory
-            ? (brushColorImageMap[product.color] || product.images?.[0] || product.image)
-            : (product.images?.[0] || product.image);
-        setActiveImage(defaultImage);
+
+        // Set initial image based on product type
+        if (isBrushCategory && product.color && brushColorImageMap[product.color]) {
+            setActiveImage(brushColorImageMap[product.color]);
+        } else if (product.images && product.images.length > 0) {
+            setActiveImage(product.images[0]);
+        } else {
+            setActiveImage(product.image);
+        }
+
         setSelectedSize(product.sizes?.[0] || '');
         setSelectedColor(product.color || '');
     }, [product, isBrushCategory]);
@@ -60,9 +93,10 @@ export default function ProductDetailPage() {
     // Get available colors for this product category
     const availableColors = useMemo(() => {
         if (!allProducts || !product) return [];
-        const colors = allProducts
-            .filter(p => p.category === product.category)
-            .map(p => p.color);
+
+        // Filter products by exact category match
+        const categoryProducts = allProducts.filter(p => p.category === product.category);
+        const colors = categoryProducts.map(p => p.color);
         const uniqueColors = [...new Set(colors)].filter(Boolean);
 
         if (isBrushCategory) {
@@ -76,18 +110,23 @@ export default function ProductDetailPage() {
     // Handle color click - update image to show selected color
     const handleColorClick = (color) => {
         setSelectedColor(color);
+
         if (isBrushCategory && brushColorImageMap[color]) {
             setActiveImage(brushColorImageMap[color]);
             return;
         }
 
+        // Find product with same category and color
         const colorProduct = allProducts?.find(p =>
             p.category === product?.category && p.color === color
         );
-        if (colorProduct && colorProduct.images && colorProduct.images[0]) {
-            setActiveImage(colorProduct.images[0]);
-        } else if (colorProduct) {
-            setActiveImage(colorProduct.image);
+
+        if (colorProduct) {
+            if (colorProduct.images && colorProduct.images[0]) {
+                setActiveImage(colorProduct.images[0]);
+            } else {
+                setActiveImage(colorProduct.image);
+            }
         }
     };
 
@@ -126,27 +165,32 @@ export default function ProductDetailPage() {
                     <Link href="/products" className="text-brand hover:underline mb-8 inline-block">← Back to Products</Link>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white dark:bg-slate-900 rounded-3xl shadow-soft p-8 border border-slate-100 dark:border-slate-800">
+                        {/* Product Image */}
                         <div>
-                            <div className={`bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center overflow-hidden ${product.category?.includes('rice') ? 'h-[500px]' : 'h-96'}`}>
+                            <div className={`bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center overflow-hidden ${isRiceCategory ? 'h-[500px]' : 'h-96'}`}>
                                 <img
                                     src={activeImage || product.image}
                                     alt={product.name}
-                                    className={`h-full w-full ${product.category?.includes('rice') ? 'object-contain' : 'object-contain'}`}
+                                    className={`h-full w-full ${isRiceCategory ? 'object-contain' : 'object-contain'}`}
                                 />
                             </div>
-                            <div className="mt-4 flex gap-3">
-                                {(product.images || [product.image]).map((img, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setActiveImage(img)}
-                                        className={`h-16 w-16 rounded-xl border ${activeImage === img ? 'border-brand' : 'border-slate-200 dark:border-slate-700'} overflow-hidden`}
-                                    >
-                                        <img src={img} alt={`${product.name} ${idx + 1}`} className="h-full w-full object-contain bg-white" />
-                                    </button>
-                                ))}
-                            </div>
+                            {/* Thumbnail images */}
+                            {(product.images && product.images.length > 0) && (
+                                <div className="mt-4 flex gap-3">
+                                    {product.images.map((img, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setActiveImage(img)}
+                                            className={`h-16 w-16 rounded-xl border ${activeImage === img ? 'border-brand' : 'border-slate-200 dark:border-slate-700'} overflow-hidden`}
+                                        >
+                                            <img src={img} alt={`${product.name} ${idx + 1}`} className="h-full w-full object-contain bg-white" />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
+                        {/* Product Details */}
                         <div className="flex flex-col justify-between">
                             <div>
                                 <p className="text-sm uppercase tracking-wide text-slate-500 mb-2">BrushRiceMart</p>
@@ -161,6 +205,7 @@ export default function ProductDetailPage() {
                                 </div>
                                 <p className="text-slate-600 dark:text-slate-300 text-lg mb-4">{product.description}</p>
 
+                                {/* Price - Only show for non-rice products */}
                                 {!isRiceCategory ? (
                                     <div className="flex items-baseline gap-3 mb-6">
                                         <span className="text-3xl font-bold text-brand">{formatCurrency(product.price)}</span>
@@ -179,7 +224,8 @@ export default function ProductDetailPage() {
                                     </div>
                                 )}
 
-                                {(product.color || availableColors.length > 0) && (
+                                {/* Color Selection - Only for brush products */}
+                                {(product.color || availableColors.length > 0) && isBrushCategory && (
                                     <div className="mb-6">
                                         <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-3">
                                             Color: {selectedColor ? selectedColor.charAt(0).toUpperCase() + selectedColor.slice(1) : 'Select'}
@@ -201,6 +247,7 @@ export default function ProductDetailPage() {
                                     </div>
                                 )}
 
+                                {/* Size Selection */}
                                 {product.sizes && (
                                     <div className="mb-6">
                                         <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-3">Size</h3>
@@ -218,6 +265,7 @@ export default function ProductDetailPage() {
                                     </div>
                                 )}
 
+                                {/* Features */}
                                 {product.features && (
                                     <div className="mb-4">
                                         <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">Why you&apos;ll love it</h3>
@@ -228,6 +276,7 @@ export default function ProductDetailPage() {
                                 )}
                             </div>
 
+                            {/* Action Buttons */}
                             <div className="mt-6 flex flex-col sm:flex-row gap-3">
                                 {isRiceCategory ? (
                                     <button
@@ -260,6 +309,7 @@ export default function ProductDetailPage() {
                         </div>
                     </div>
 
+                    {/* Reviews Section */}
                     <section className="mt-12">
                         <h2 className="text-2xl font-display font-semibold text-slate-900 dark:text-white mb-6">Reviews</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -276,13 +326,20 @@ export default function ProductDetailPage() {
                         </div>
                     </section>
 
+                    {/* Related Products - Show category-specific products */}
                     <section className="mt-12">
-                        <h2 className="text-2xl font-display font-semibold text-slate-900 dark:text-white mb-6">Related Products</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {relatedProducts.map((item) => (
-                                <ProductCard key={item.id} product={item} onAddToCart={() => addToCart(item)} />
-                            ))}
-                        </div>
+                        <h2 className="text-2xl font-display font-semibold text-slate-900 dark:text-white mb-6">
+                            {isRiceCategory ? 'More Rice Options' : 'Related Products'}
+                        </h2>
+                        {relatedProducts.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {relatedProducts.map((item) => (
+                                    <ProductCard key={item.id} product={item} onAddToCart={() => addToCart(item)} />
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-slate-500">No related products found.</p>
+                        )}
                     </section>
                 </div>
             </main>

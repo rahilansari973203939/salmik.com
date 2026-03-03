@@ -77,10 +77,7 @@ export default function AdminSidebar() {
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-                                        ? 'bg-gradient-to-r from-brand to-brand-dark text-white shadow-md'
-                                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                                    }`}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive ? 'bg-gradient-to-r from-brand to-brand-dark text-white shadow-md' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                             >
                                 {item.icon}
                                 <span className="font-semibold">{item.name}</span>

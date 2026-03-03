@@ -218,14 +218,6 @@ export default function LoginPage() {
                             Create account
                         </Link>
                     </div>
-
-                    <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
-                        <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
-                            <span className="font-semibold">Admin Login:</span><br />
-                            Email: admin@salmik.com<br />
-                            Password: admin123
-                        </p>
-                    </div>
                 </div>
             </main>
             <Footer />

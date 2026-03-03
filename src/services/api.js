@@ -4,7 +4,7 @@
 // Set USE_BACKEND = true when you connect your backend
 // Set USE_BACKEND = false to use localStorage (current behavior)
 export const USE_BACKEND = false;
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 // ============================================
 // LOCAL STORAGE HELPERS (Fallback Mode)
@@ -13,7 +13,7 @@ import productsData from '@/data/products.json';
 
 const PRODUCTS_KEY = 'products';
 const PRODUCTS_VERSION_KEY = 'productsVersion';
-const PRODUCTS_VERSION = 3;
+const PRODUCTS_VERSION = 4;
 const ORDERS_KEY = 'orders';
 const USERS_KEY = 'allUsers';
 
@@ -242,12 +242,42 @@ export const searchProducts = (query) => {
     );
 };
 
+// Define brush categories
+const BRUSH_CATEGORIES = [
+    'paddle-brush', 'round-brush', 'curly', 'detangling-brush',
+    'easy-clean', 'jelly', 'kitty-puf', 'love', 'makaron',
+    'miracle', 'mirror', 'multy', 'pro-puf', 'self-cleaning',
+    'shiny', 'smiley', 'twist', 'detangler', 'comb'
+];
+
+// Define rice categories
+const RICE_CATEGORIES = ['basmati-rice', 'brown-rice', 'jasmine-rice'];
+
 // Filter API
 export const filterProducts = (filters) => {
     let filtered = [...ensureProducts()];
 
     if (filters.category) {
-        filtered = filtered.filter(p => p.category === filters.category);
+        // If selected category is a brush category
+        if (BRUSH_CATEGORIES.includes(filters.category)) {
+            filtered = filtered.filter(p => p.category === filters.category);
+        }
+        // If selected category is a rice category
+        else if (RICE_CATEGORIES.includes(filters.category)) {
+            filtered = filtered.filter(p => p.category === filters.category);
+        }
+        // Legacy support for 'rice' selection
+        else if (filters.category === 'rice') {
+            filtered = filtered.filter(p => RICE_CATEGORIES.includes(p.category));
+        }
+        // Legacy support for 'brushes' selection
+        else if (filters.category === 'brushes') {
+            filtered = filtered.filter(p => BRUSH_CATEGORIES.includes(p.category));
+        }
+        // For any other category
+        else {
+            filtered = filtered.filter(p => p.category === filters.category);
+        }
     }
 
     if (filters.priceRange) {

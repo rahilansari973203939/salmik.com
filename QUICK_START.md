@@ -365,7 +365,7 @@ All routes are in `app/` directory using Next.js App Router.
 - Responsive design done ✅
 - Ready for testing ✅
 
-**Next Phase**: Backend Integration & Payment Gateway
+**Next Phase**: Backend Integration
 
 ---
 

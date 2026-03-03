@@ -8,7 +8,8 @@
       "@/services/*": ["./src/services/*"],
       "@/data/*": ["./src/data/*"],
       "@/hooks/*": ["./src/hooks/*"],
-      "@/utils/*": ["./src/utils/*"]
+      "@/utils/*": ["./src/utils/*"],
+      "@/lib/*": ["./src/lib/*"]
     }
   },
   "include": ["next.config.js"]
